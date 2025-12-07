@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- 核心修改：图标已设置为“4” -->
+    <link rel="apple-touch-icon" href="https://ui-avatars.com/api/?name=4&background=007aff&color=fff&size=512&font-size=0.6&length=1">
+
+    <title>第4课 - 大家的日语</title>
+    <style>
+        :root { --primary: #007aff; --bg: #f2f2f7; --mask-bg: #d1d1d6; }
+        body { font-family: -apple-system, "Helvetica Neue", sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        .header { padding: 15px; text-align: center; background: #fff; font-weight: bold; border-bottom: 1px solid #ddd; z-index: 10; font-size: 1.1rem; flex-shrink: 0;}
+        .container { flex: 1; padding: 15px; overflow-y: auto; display: flex; justify-content: center; align-items: flex-start; -webkit-overflow-scrolling: touch;}
+        .card { background: #fff; width: 100%; max-width: 500px; border-radius: 16px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center; margin-bottom: 40px;}
+        
+        .tag { background: #e5e5ea; color: #666; padding: 4px 10px; border-radius: 6px; font-size: 0.9rem; margin-bottom: 15px; display: inline-block; font-weight: bold;}
+
+        /* === 布局 === */
+        .dialogue-row { display: flex; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+        .play-col { width: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-right: 10px; padding-top: 5px; }
+        .play-icon { font-size: 1.4rem; color: var(--primary); cursor: pointer; background: #eef7ff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .play-icon:active { background: #007aff; color: white; transform: scale(0.9); }
+        .text-col { flex: 1; text-align: left; }
+        
+        /* 角色标签 */
+        .role-tag { font-size: 0.7rem; font-weight: bold; color: white; padding: 2px 6px; border-radius: 4px; margin-right: 5px; vertical-align: middle; display: inline-block; margin-bottom: 4px;}
+        .role-m { background-color: #5856d6; } /* 男声/米勒 */
+        .role-f { background-color: #ff2d55; } /* 女声/佐藤/店员 */
+        
+        /* 遮挡条 */
+        .text-block { transition: all 0.2s; border-radius: 6px; padding: 6px 8px; cursor: pointer; display: block; margin-bottom: 6px; line-height: 1.5; border: 1px solid transparent; }
+        .masked { background-color: var(--mask-bg); color: transparent !important; position: relative; border-color: transparent; user-select: none;}
+        .masked::after { content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; background: #999; border-radius: 50%; }
+
+        .jp-text { font-size: 1.15rem; font-weight: bold; color: #000; }
+        .cn-text { font-size: 0.95rem; color: #666; }
+        .playing-row { background-color: #f0f9ff; border-radius: 8px; }
+
+        /* 底部控制栏 */
+        .controls { padding: 15px; background: #fff; border-top: 1px solid #ddd; flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom);}
+        .row { display: flex; gap: 10px; margin-bottom: 8px; }
+        button { border: none; padding: 12px; border-radius: 10px; font-size: 0.95rem; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; touch-action: manipulation;}
+        .btn-green { background: #34c759; color: white; width: 100%; font-size: 1rem; margin-bottom: 10px; padding: 14px;}
+        .btn-green:active { background: #248a3d; }
+        .btn-nav { background: #eee; color: #333; flex: 1; }
+        .btn-toggle { background: #fff; border: 1px solid #ccc; color: #333; flex: 1; }
+        .btn-toggle.active { background: #007aff; color: white; border: none; }
+        #status-bar { font-size: 10px; color: #999; text-align: center; margin-top: 5px; height: 15px;}
+    </style>
+</head>
+<body>
+
+    <div class="header" id="headerTitle">第4课</div>
+
+    <div class="container">
+        <div id="cardArea" class="card"></div>
+    </div>
+
+    <div class="controls">
+        <div id="status-bar">准备就绪</div>
+        <div class="row">
+            <button class="btn-toggle" id="btnJp" onclick="toggleGlobal('jp')">全显日文</button>
+            <button class="btn-toggle" id="btnCn" onclick="toggleGlobal('cn')">全显中文</button>
+        </div>
+        <div class="row">
+            <button class="btn-nav" onclick="changeCard(-1)">⬅️ 上一条</button>
+            <button class="btn-nav" onclick="changeCard(1)">下一条 ➡️</button>
+        </div>
+    </div>
+
+    <script>
+        // ===============================================
+        // 数据区：第4课
+        // ===============================================
+        const lessonData = [
+            // --- 练习 1-7 (图片1) ---
+            { 
+                category: '练习 1', 
+                lines: [
+                    { role: 'Q', gender: 'f', jp: '今　何時ですか。', cn: '现在几点？' }, 
+                    { role: 'A', gender: 'm', jp: '2時10分です。', cn: '2点10分。' },
+                    { role: 'Q', gender: 'f', jp: 'ニューヨークは　今　何時ですか。', cn: '纽约现在几点？' }, 
+                    { role: 'A', gender: 'm', jp: '午前　0時10分です。', cn: '上午0点10分。' }
+                ] 
+            },
+            { 
+                category: '练习 2', 
+                lines: [
+                    { role: 'Q', gender: 'f', jp: '休みは　何曜日ですか。', cn: '休息日是星期几？' }, 
+                    { role: 'A', gender: 'm', jp: '土曜日と　日曜日です。', cn: '是星期六和星期日。' }
+                ] 
+            },
+            { 
+                category: '练习 3', 
+                lines: [
+                    { role: 'Q', gender: 'f', jp: 'アップル銀行は　何時から　何時までですか。', cn: '苹果银行从几点到几点营业？' }, 
+                    { role: 'A', gender: 'm', jp: '9時から　3時までです。', cn: '从9点到3点。' }
+                ] 
+            },
+            { 
+                category: '练习 4', 
+                lines: [
+                    { role: 'Q', gender: 'f', jp: '毎晩　何時に　寝ますか。', cn: '每晚几点睡觉？' }, 
+                    { role: 'A', gender: 'm', jp: '11時に　寝ます。', cn: '11点睡觉。' }
+                ] 
+            },
+            { 
+                category: '练习 5', 
+                lines: [
+                    { role: 'Q', gender: 'f', jp: '毎日　何時から　何時まで　勉強しますか。', cn: '每天从几点到几点学习？' }, 
+                    { role: 'A', gender: 'm', jp: '朝　9時から　午後　3時まで　勉強します。', cn: '从早上9点学到下午3点。' }
+                ] 
+            },
+            { 
+                category: '练习 6', 
+                lines: [
+                    { role: 'Q', gender: 'f', jp: '土曜日　働きますか。', cn: '星期六工作吗？' }, 
+                    { role: 'A', gender: 'm', jp: '……いいえ、働きません。', cn: '……不，不工作。' }
+                ] 
+            },
+            { 
+                category: '练习 7', 
+                lines: [
+                    { role: 'Q', gender: 'f', jp: 'きのう　勉強しましたか。', cn: '昨天学习了吗？' }, 
+                    { role: 'A', gender: 'm', jp: '……いいえ、勉強しませんでした。', cn: '……不，没学习。' }
+                ] 
+            },
+
+            // --- 会话 (图片2) ---
+            {
+                category: '会话 1：询问电话号码',
+                lines: [
+                    { role: 'ミラー', gender: 'm', jp: 'すみません、「あすか」の　電話番号は　何番ですか。', cn: '对不起，请问“Asuka”的电话号码是多少？' },
+                    { role: '佐藤', gender: 'f', jp: '「あすか」ですか。5275の　2725です。', cn: '“Asuka”吗？是5275-2725。' },
+                    { role: 'ミラー', gender: 'm', jp: 'どうも　ありがとう　ございます。', cn: '非常感谢。' }
+                ]
+            },
+            {
+                category: '会话 2：那边营业到几点',
+                lines: [
+                    { role: '店の人', gender: 'f', jp: 'はい、「あすか」です。', cn: '你好，这里是“Asuka”。' },
+                    { role: 'ミラー', gender: 'm', jp: 'すみません。そちらは　何時までですか。', cn: '请问，你们那里营业到几点？' },
+                    { role: '店の人', gender: 'f', jp: '10時までです。', cn: '到10点。' },
+                    { role: 'ミラー', gender: 'm', jp: '休みは　何曜日ですか。', cn: '休息日是星期几？' },
+                    { role: '店の人', gender: 'f', jp: '日曜日です。', cn: '是星期天。' },
+                    { role: 'ミラー', gender: 'm', jp: 'そうですか。どうも。', cn: '是吗。谢谢。' }
+                ]
+            },
+
+            // --- 短对话 (图片3) ---
+            {
+                category: '练习：真辛苦啊',
+                lines: [
+                    { role: 'A', gender: 'f', jp: 'きのう　12時まで　勉強しました。', cn: '昨天我学习到了12点。' },
+                    { role: 'B', gender: 'm', jp: 'そうですか。何時に　寝ましたか。', cn: '是吗。几点睡的？' },
+                    { role: 'A', gender: 'f', jp: '1時に　寝ました。', cn: '1点睡的。' },
+                    { role: 'B', gender: 'm', jp: '大変ですね。', cn: '真辛苦啊/够受的啊。' }
+                ]
+            }
+        ];
+
+        // ================= 状态管理 =================
+        let currentIndex = 0;
+        let globalShowJp = false;
+        let globalShowCn = false;
+        let isSeqPlaying = false;
+        let voices = { male: null, female: null, default: null };
+
+        // ================= 语音引擎 =================
+        function loadVoices() {
+            const all = window.speechSynthesis.getVoices();
+            const ja = all.filter(v => v.lang.includes('ja'));
+            if (ja.length > 0) {
+                // 尝试区分男女声
+                voices.female = ja.find(v => v.name.includes('Kyoko') || v.name.includes('Female')) || ja[0];
+                voices.male = ja.find(v => v.name.includes('Otoya') || v.name.includes('Male')) || ja[0];
+                voices.default = ja[0];
+                document.getElementById('status-bar').innerText = "✅ 语音加载完成";
+            } else {
+                document.getElementById('status-bar').innerText = "⚠️ 使用默认语音";
+            }
+        }
+        // 兼容性处理
+        if (window.speechSynthesis.onvoiceschanged !== undefined) window.speechSynthesis.onvoiceschanged = loadVoices;
+        setTimeout(loadVoices, 500);
+
+        function speak(text, gender, callback) {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'ja-JP';
+            u.rate = 0.9; // 语速稍慢
+            
+            // 声音分配
+            if (gender === 'm' && voices.male) u.voice = voices.male;
+            else if (gender === 'f' && voices.female) u.voice = voices.female;
+            else if (voices.default) u.voice = voices.default;
+
+            // 音调微调
+            if (gender === 'm') u.pitch = 0.95;
+            else u.pitch = 1.05;
+
+            if (callback) u.onend = callback;
+            window.speechSynthesis.speak(u);
+        }
+
+        // ================= 渲染逻辑 =================
+        function render() {
+            window.speechSynthesis.cancel();
+            isSeqPlaying = false;
+            
+            const data = lessonData[currentIndex];
+            document.getElementById('headerTitle').innerText = `${data.category} (${currentIndex + 1}/${lessonData.length})`;
+            
+            updateGlobalBtns();
+
+            let html = `<div class="tag">${data.category}</div>`;
+            html += `<button class="btn-green" onclick="playSequence()">▶️ 完整播放 (包含停顿)</button>`;
+            html += `<div style="text-align:left; width:100%;">`;
+
+            data.lines.forEach((line, idx) => {
+                const jpClass = globalShowJp ? 'text-block jp-text' : 'text-block jp-text masked';
+                const cnClass = globalShowCn ? 'text-block cn-text' : 'text-block cn-text masked';
+                
+                // 角色颜色分配
+                let roleClass = 'role-f';
+                if (line.gender === 'm') roleClass = 'role-m';
+
+                html += `
+                    <div class="dialogue-row" id="row-${idx}">
+                        <div class="play-col"><div class="play-icon" onclick="playLine(${idx})">🔊</div></div>
+                        <div class="text-col">
+                            ${line.role ? `<span class="role-tag ${roleClass}">${line.role}</span>` : ''}
+                            <div class="${jpClass}" onclick="toggleOne(this)">${line.jp}</div>
+                            <div class="${cnClass}" onclick="toggleOne(this)">${line.cn}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            document.getElementById('cardArea').innerHTML = html;
+        }
+
+        // ================= 交互逻辑 =================
+        function toggleOne(el) { 
+            if(el.classList.contains('masked')) el.classList.remove('masked');
+            else el.classList.add('masked');
+        }
+
+        function toggleGlobal(type) {
+            if (type === 'jp') globalShowJp = !globalShowJp;
+            if (type === 'cn') globalShowCn = !globalShowCn;
+            render();
+        }
+
+        function updateGlobalBtns() {
+            const bJ = document.getElementById('btnJp');
+            const bC = document.getElementById('btnCn');
+            bJ.className = globalShowJp ? 'btn-toggle active' : 'btn-toggle';
+            bC.className = globalShowCn ? 'btn-toggle active' : 'btn-toggle';
+            bJ.innerText = globalShowJp ? '全显日文' : '全隐日文';
+            bC.innerText = globalShowCn ? '全显中文' : '全隐中文';
+        }
+
+        function playLine(idx) {
+            isSeqPlaying = false;
+            highlightRow(idx);
+            const data = lessonData[currentIndex];
+            const line = data.lines[idx];
+            speak(line.jp, line.gender, () => {
+                unhighlightRow(idx);
+            });
+        }
+
+        function playSequence() {
+            isSeqPlaying = true;
+            const data = lessonData[currentIndex];
+            let idx = 0;
+            
+            // 清除旧的高亮
+            document.querySelectorAll('.dialogue-row').forEach(e => e.classList.remove('playing-row'));
+
+            function next() {
+                if (!isSeqPlaying || idx >= data.lines.length) {
+                    isSeqPlaying = false;
+                    if(idx > 0) unhighlightRow(idx-1);
+                    return;
+                }
+                
+                if (idx > 0) unhighlightRow(idx-1);
+                highlightRow(idx);
+                
+                document.getElementById(`row-${idx}`).scrollIntoView({behavior: "smooth", block: "center"});
+
+                const line = data.lines[idx];
+                speak(line.jp, line.gender, () => {
+                    idx++;
+                    // 句与句之间暂停0.6秒
+                    setTimeout(next, 600);
+                });
+            }
+            next();
+        }
+
+        function highlightRow(idx) {
+            const el = document.getElementById(`row-${idx}`);
+            if (el) el.classList.add('playing-row');
+        }
+
+        function unhighlightRow(idx) {
+            const el = document.getElementById(`row-${idx}`);
+            if (el) el.classList.remove('playing-row');
+        }
+
+        function changeCard(dir) {
+            const next = currentIndex + dir;
+            if (next >= 0 && next < lessonData.length) {
+                currentIndex = next;
+                render();
+            }
+        }
+
+        // 初始化
+        render();
+    </script>
+</body>
+</html>
