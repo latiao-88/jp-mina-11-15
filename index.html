@@ -6,31 +6,42 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
-    <!-- 核心修改：图标已设置为“4” -->
-    <link rel="apple-touch-icon" href="https://ui-avatars.com/api/?name=4&background=007aff&color=fff&size=512&font-size=0.6&length=1">
+    <!-- 图标设置为 11-15 -->
+    <link rel="apple-touch-icon" href="https://ui-avatars.com/api/?name=11-15&background=5856d6&color=fff&size=512&font-size=0.4&length=5">
 
-    <title>第4课 - 大家的日语</title>
+    <title>第11-15课 综合练习</title>
     <style>
-        :root { --primary: #007aff; --bg: #f2f2f7; --mask-bg: #d1d1d6; }
+        :root { --primary: #5856d6; --bg: #f2f2f7; --mask-bg: #d1d1d6; }
         body { font-family: -apple-system, "Helvetica Neue", sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        .header { padding: 15px; text-align: center; background: #fff; font-weight: bold; border-bottom: 1px solid #ddd; z-index: 10; font-size: 1.1rem; flex-shrink: 0;}
-        .container { flex: 1; padding: 15px; overflow-y: auto; display: flex; justify-content: center; align-items: flex-start; -webkit-overflow-scrolling: touch;}
-        .card { background: #fff; width: 100%; max-width: 500px; border-radius: 16px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center; margin-bottom: 40px;}
+        /* 顶部控制区 */
+        .header { background: #fff; border-bottom: 1px solid #ddd; z-index: 10; flex-shrink: 0; display: flex; flex-direction: column;}
+        .title-bar { padding: 12px; text-align: center; font-weight: bold; font-size: 1.1rem; border-bottom: 1px solid #eee;}
+        .filter-bar { padding: 10px; display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; align-items: center;}
         
+        /* 复选框样式 */
+        .filter-label { display: flex; align-items: center; background: #eee; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; }
+        .filter-label input { margin-right: 6px; }
+        .filter-label.checked { background: #e0e0ff; color: var(--primary); font-weight: bold; border: 1px solid var(--primary); }
+
+        .container { flex: 1; padding: 15px; overflow-y: auto; display: flex; justify-content: center; align-items: flex-start; -webkit-overflow-scrolling: touch;}
+        .card { background: #fff; width: 100%; max-width: 500px; border-radius: 16px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center; margin-bottom: 40px; position: relative;}
+        
+        /* 课程角标 */
+        .lesson-badge { position: absolute; top: 10px; right: 10px; background: #ff9500; color: white; font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; font-weight: bold;}
         .tag { background: #e5e5ea; color: #666; padding: 4px 10px; border-radius: 6px; font-size: 0.9rem; margin-bottom: 15px; display: inline-block; font-weight: bold;}
 
         /* === 布局 === */
         .dialogue-row { display: flex; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
         .play-col { width: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-right: 10px; padding-top: 5px; }
         .play-icon { font-size: 1.4rem; color: var(--primary); cursor: pointer; background: #eef7ff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .play-icon:active { background: #007aff; color: white; transform: scale(0.9); }
+        .play-icon:active { background: var(--primary); color: white; transform: scale(0.9); }
         .text-col { flex: 1; text-align: left; }
         
         /* 角色标签 */
         .role-tag { font-size: 0.7rem; font-weight: bold; color: white; padding: 2px 6px; border-radius: 4px; margin-right: 5px; vertical-align: middle; display: inline-block; margin-bottom: 4px;}
-        .role-m { background-color: #5856d6; } /* 男声/米勒 */
-        .role-f { background-color: #ff2d55; } /* 女声/佐藤/店员 */
+        .role-m { background-color: #5856d6; } 
+        .role-f { background-color: #ff2d55; }
         
         /* 遮挡条 */
         .text-block { transition: all 0.2s; border-radius: 6px; padding: 6px 8px; cursor: pointer; display: block; margin-bottom: 6px; line-height: 1.5; border: 1px solid transparent; }
@@ -42,20 +53,42 @@
         .playing-row { background-color: #f0f9ff; border-radius: 8px; }
 
         /* 底部控制栏 */
-        .controls { padding: 15px; background: #fff; border-top: 1px solid #ddd; flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom);}
-        .row { display: flex; gap: 10px; margin-bottom: 8px; }
-        button { border: none; padding: 12px; border-radius: 10px; font-size: 0.95rem; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; touch-action: manipulation;}
-        .btn-green { background: #34c759; color: white; width: 100%; font-size: 1rem; margin-bottom: 10px; padding: 14px;}
-        .btn-green:active { background: #248a3d; }
+        .controls { padding: 10px 15px; background: #fff; border-top: 1px solid #ddd; flex-shrink: 0; padding-bottom: calc(10px + env(safe-area-inset-bottom));}
+        .row { display: flex; gap: 8px; margin-bottom: 8px; }
+        button { border: none; padding: 12px; border-radius: 10px; font-size: 0.9rem; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; touch-action: manipulation;}
+        .btn-green { background: #34c759; color: white; width: 100%; font-size: 1rem; margin-bottom: 8px; padding: 12px;}
+        .btn-blue { background: #007aff; color: white; flex: 1; }
         .btn-nav { background: #eee; color: #333; flex: 1; }
         .btn-toggle { background: #fff; border: 1px solid #ccc; color: #333; flex: 1; }
-        .btn-toggle.active { background: #007aff; color: white; border: none; }
-        #status-bar { font-size: 10px; color: #999; text-align: center; margin-top: 5px; height: 15px;}
+        .btn-toggle.active { background: #5ac8fa; color: white; border: none; }
+        #status-bar { font-size: 10px; color: #999; text-align: center; margin-top: 2px; height: 14px;}
+        
+        .empty-tip { color: #999; margin-top: 50px; }
     </style>
 </head>
 <body>
 
-    <div class="header" id="headerTitle">第4课</div>
+    <div class="header">
+        <div class="title-bar" id="pageTitle">第11-15课 综合练习</div>
+        <div class="filter-bar">
+            <!-- 课程筛选器 -->
+            <label class="filter-label checked" onclick="toggleFilter(this, 11)">
+                <input type="checkbox" checked hidden> 第11课
+            </label>
+            <label class="filter-label checked" onclick="toggleFilter(this, 12)">
+                <input type="checkbox" checked hidden> 第12课
+            </label>
+            <label class="filter-label checked" onclick="toggleFilter(this, 13)">
+                <input type="checkbox" checked hidden> 第13课
+            </label>
+            <label class="filter-label checked" onclick="toggleFilter(this, 14)">
+                <input type="checkbox" checked hidden> 第14课
+            </label>
+            <label class="filter-label checked" onclick="toggleFilter(this, 15)">
+                <input type="checkbox" checked hidden> 第15课
+            </label>
+        </div>
+    </div>
 
     <div class="container">
         <div id="cardArea" class="card"></div>
@@ -66,6 +99,7 @@
         <div class="row">
             <button class="btn-toggle" id="btnJp" onclick="toggleGlobal('jp')">全显日文</button>
             <button class="btn-toggle" id="btnCn" onclick="toggleGlobal('cn')">全显中文</button>
+            <button class="btn-blue" onclick="shuffleAndReset()">🔀 打乱重来</button>
         </div>
         <div class="row">
             <button class="btn-nav" onclick="changeCard(-1)">⬅️ 上一条</button>
@@ -75,135 +109,133 @@
 
     <script>
         // ===============================================
-        // 数据区：第4课
+        // 全量数据：Lesson 11 - 15
         // ===============================================
-        const lessonData = [
-            // --- 练习 1-7 (图片1) ---
-            { 
-                category: '练习 1', 
-                lines: [
-                    { role: 'Q', gender: 'f', jp: '今　何時ですか。', cn: '现在几点？' }, 
-                    { role: 'A', gender: 'm', jp: '2時10分です。', cn: '2点10分。' },
-                    { role: 'Q', gender: 'f', jp: 'ニューヨークは　今　何時ですか。', cn: '纽约现在几点？' }, 
-                    { role: 'A', gender: 'm', jp: '午前　0時10分です。', cn: '上午0点10分。' }
-                ] 
-            },
-            { 
-                category: '练习 2', 
-                lines: [
-                    { role: 'Q', gender: 'f', jp: '休みは　何曜日ですか。', cn: '休息日是星期几？' }, 
-                    { role: 'A', gender: 'm', jp: '土曜日と　日曜日です。', cn: '是星期六和星期日。' }
-                ] 
-            },
-            { 
-                category: '练习 3', 
-                lines: [
-                    { role: 'Q', gender: 'f', jp: 'アップル銀行は　何時から　何時までですか。', cn: '苹果银行从几点到几点营业？' }, 
-                    { role: 'A', gender: 'm', jp: '9時から　3時までです。', cn: '从9点到3点。' }
-                ] 
-            },
-            { 
-                category: '练习 4', 
-                lines: [
-                    { role: 'Q', gender: 'f', jp: '毎晩　何時に　寝ますか。', cn: '每晚几点睡觉？' }, 
-                    { role: 'A', gender: 'm', jp: '11時に　寝ます。', cn: '11点睡觉。' }
-                ] 
-            },
-            { 
-                category: '练习 5', 
-                lines: [
-                    { role: 'Q', gender: 'f', jp: '毎日　何時から　何時まで　勉強しますか。', cn: '每天从几点到几点学习？' }, 
-                    { role: 'A', gender: 'm', jp: '朝　9時から　午後　3時まで　勉強します。', cn: '从早上9点学到下午3点。' }
-                ] 
-            },
-            { 
-                category: '练习 6', 
-                lines: [
-                    { role: 'Q', gender: 'f', jp: '土曜日　働きますか。', cn: '星期六工作吗？' }, 
-                    { role: 'A', gender: 'm', jp: '……いいえ、働きません。', cn: '……不，不工作。' }
-                ] 
-            },
-            { 
-                category: '练习 7', 
-                lines: [
-                    { role: 'Q', gender: 'f', jp: 'きのう　勉強しましたか。', cn: '昨天学习了吗？' }, 
-                    { role: 'A', gender: 'm', jp: '……いいえ、勉強しませんでした。', cn: '……不，没学习。' }
-                ] 
-            },
+        const rawData = [
+            // === 第11课 (数量词) ===
+            { lesson: 11, category: '练习 1', lines: [{ role: 'Q', gender: 'f', jp: 'りんごを　いくつ　買いましたか。', cn: '买了几个苹果？' }, { role: 'A', gender: 'm', jp: '…4つ　買いました。', cn: '…买了4个。' }] },
+            { lesson: 11, category: '练习 2', lines: [{ role: 'A', gender: 'f', jp: '80円の　切手を　5枚と　はがきを　2枚　ください。', cn: '请给我5张80日元的邮票和2张明信片。' }, { role: 'B', gender: 'm', jp: '…はい。全部で　500円です。', cn: '…好的。一共500日元。' }] },
+            { lesson: 11, category: '练习 3', lines: [{ role: 'Q', gender: 'f', jp: '富士大学に　外国人の　先生が　いますか。', cn: '富士大学有外籍老师吗？' }, { role: 'A', gender: 'm', jp: '…はい、3人　います。みんな　アメリカ人です。', cn: '…有，有3人。都是美国人。' }] },
+            { lesson: 11, category: '练习 4', lines: [{ role: 'Q', gender: 'f', jp: '兄弟は　何人ですか。', cn: '兄弟姐妹有几人？' }, { role: 'A', gender: 'm', jp: '…4人です。姉が　2人と　兄が　1人　います。', cn: '…4人。有2个姐姐和1个哥哥。' }] },
+            { lesson: 11, category: '练习 5', lines: [{ role: 'Q', gender: 'f', jp: '1週間に　何回　テニスを　しますか。', cn: '一周打几次网球？' }, { role: 'A', gender: 'm', jp: '…2回ぐらい　します。', cn: '…打2次左右。' }] },
+            { lesson: 11, category: '练习 6', lines: [{ role: 'Q', gender: 'm', jp: '田中さんは　どのくらい　スペイン語を　勉強しましたか。', cn: '田中先生学了多久的西班牙语？' }, { role: 'A', gender: 'f', jp: '…3か月　勉強しました。', cn: '…学了3个月。' }, { role: 'B', gender: 'm', jp: '3か月だけですか。上手ですね。', cn: '只学了3个月吗？真厉害啊。' }] },
+            { lesson: 11, category: '练习 7', lines: [{ role: 'Q', gender: 'f', jp: '大阪から　東京まで　新幹線で　どのくらい　かかりますか。', cn: '从大阪到东京坐新干线要花多久？' }, { role: 'A', gender: 'm', jp: '…2時間半　かかります。', cn: '…要花2个半小时。' }] },
+            { lesson: 11, category: '会话：拜托这个(寄信)', lines: [{ role: '管理人', gender: 'f', jp: 'いい　天気ですね。お出かけですか。', cn: '天气真好啊。您要出门吗？' }, { role: 'ワン', gender: 'm', jp: 'ええ、ちょっと　郵便局まで。', cn: '嗯，去一下邮局。' }, { role: '管理人', gender: 'f', jp: 'そうですか。行ってらっしゃい。', cn: '是吗。慢走。' }, { role: 'ワン', gender: 'm', jp: '行って　きます。', cn: '我走了。' }, { role: 'ワン', gender: 'm', jp: 'これ、オーストラリアまで　お願いします。', cn: '麻烦把这个寄到澳大利亚。' }, { role: '郵便局員', gender: 'f', jp: 'はい。船便ですか、航空便ですか。', cn: '好的。是海运还是航空件？' }, { role: 'ワン', gender: 'm', jp: '航空便は　いくらですか。', cn: '航空件多少钱？' }, { role: '郵便局員', gender: 'f', jp: '7,600円です。', cn: '7,600日元。' }, { role: 'ワン', gender: 'm', jp: '船便は？', cn: '海运呢？' }, { role: '郵便局員', gender: 'f', jp: '3,450円です。', cn: '3,450日元。' }, { role: 'ワン', gender: 'm', jp: 'どのくらい　かかりますか。', cn: '要花多久时间？' }, { role: '郵便局員', gender: 'f', jp: '航空便で　7日、船便で　2か月ぐらいです。', cn: '航空件7天，海运2个月左右。' }, { role: 'ワン', gender: 'm', jp: 'じゃ、船便で　お願いします。', cn: '那麻烦用海运。' }] },
 
-            // --- 会话 (图片2) ---
-            {
-                category: '会话 1：询问电话号码',
-                lines: [
-                    { role: 'ミラー', gender: 'm', jp: 'すみません、「あすか」の　電話番号は　何番ですか。', cn: '对不起，请问“Asuka”的电话号码是多少？' },
-                    { role: '佐藤', gender: 'f', jp: '「あすか」ですか。5275の　2725です。', cn: '“Asuka”吗？是5275-2725。' },
-                    { role: 'ミラー', gender: 'm', jp: 'どうも　ありがとう　ございます。', cn: '非常感谢。' }
-                ]
-            },
-            {
-                category: '会话 2：那边营业到几点',
-                lines: [
-                    { role: '店の人', gender: 'f', jp: 'はい、「あすか」です。', cn: '你好，这里是“Asuka”。' },
-                    { role: 'ミラー', gender: 'm', jp: 'すみません。そちらは　何時までですか。', cn: '请问，你们那里营业到几点？' },
-                    { role: '店の人', gender: 'f', jp: '10時までです。', cn: '到10点。' },
-                    { role: 'ミラー', gender: 'm', jp: '休みは　何曜日ですか。', cn: '休息日是星期几？' },
-                    { role: '店の人', gender: 'f', jp: '日曜日です。', cn: '是星期天。' },
-                    { role: 'ミラー', gender: 'm', jp: 'そうですか。どうも。', cn: '是吗。谢谢。' }
-                ]
-            },
+            // === 第12课 (形容词过去/比较) ===
+            { lesson: 12, category: '例文 1', lines: [{ role: 'Q', gender: 'f', jp: '京都は　静かでしたか。', cn: '京都安静吗？(过去)' }, { role: 'A', gender: 'm', jp: '…いいえ、静かじゃ　ありませんでした。', cn: '…不，不安静。' }] },
+            { lesson: 12, category: '例文 2', lines: [{ role: 'Q', gender: 'f', jp: '旅行は　楽しかったですか。', cn: '旅行开心吗？' }, { role: 'A', gender: 'm', jp: '…はい、楽しかったです。', cn: '…是的，很开心。' }, { role: 'Q', gender: 'f', jp: '天気は　よかったですか。', cn: '天气好吗？' }, { role: 'A', gender: 'm', jp: '…いいえ、あまり　よくなかったです。', cn: '…不，不太好。' }] },
+            { lesson: 12, category: '例文 3', lines: [{ role: 'Q', gender: 'f', jp: 'きのうの　パーティーは　どうでしたか。', cn: '昨天的派对怎么样？' }, { role: 'A', gender: 'm', jp: '…とても　にぎやかでした。いろいろな　人に　会いました。', cn: '…非常热闹。见到了各种各样的人。' }] },
+            { lesson: 12, category: '例文 4', lines: [{ role: 'Q', gender: 'f', jp: 'ニューヨークは　大阪より　寒いですか。', cn: '纽约比大阪冷吗？' }, { role: 'A', gender: 'm', jp: '…ええ、ずっと　寒いです。', cn: '…是的，冷得多。' }] },
+            { lesson: 12, category: '例文 5', lines: [{ role: 'Q', gender: 'm', jp: '空港まで　バスと　電車と　どちらが　速いですか。', cn: '到机场巴士和电车哪个快？' }, { role: 'A', gender: 'f', jp: '…電車の　ほうが　速いです。', cn: '…电车更快。' }] },
+            { lesson: 12, category: '例文 6', lines: [{ role: 'Q', gender: 'm', jp: '海と　山と　どちらが　好きですか。', cn: '大海和山，喜欢哪一个？' }, { role: 'A', gender: 'f', jp: '…どちらも　好きです。', cn: '…两个都喜欢。' }] },
+            { lesson: 12, category: '例文 7', lines: [{ role: 'Q', gender: 'm', jp: '日本料理の　中で　何が　いちばん　好きですか。', cn: '日本料理中，最喜欢什么？' }, { role: 'A', gender: 'f', jp: '…てんぷらが　いちばん　好きです。', cn: '…最喜欢天妇罗。' }] },
+            { lesson: 12, category: '会话：祗园祭怎么样', lines: [{ role: 'ミラー', gender: 'm', jp: 'ただいま。', cn: '我回来了。' }, { role: '管理人', gender: 'f', jp: 'お帰りなさい。', cn: '你回来啦。' }, { role: 'ミラー', gender: 'm', jp: 'これ、京都の　お土産です。', cn: '这是京都的特产。' }, { role: '管理人', gender: 'f', jp: 'どうも　すみません。', cn: '真是太感谢了。' }, { role: '管理人', gender: 'f', jp: '祗園祭は　どうでしたか。', cn: '祗园祭怎么样？' }, { role: 'ミラー', gender: 'm', jp: 'おもしろかったです。とても　にぎやかでした。', cn: '很有趣。非常热闹。' }, { role: '管理人', gender: 'f', jp: '祗園祭は　京都の　祭りで　いちばん　有名ですからね。', cn: '毕竟祗园祭是京都最出名的节日嘛。' }, { role: 'ミラー', gender: 'm', jp: 'そうですか。写真を　たくさん　撮りました。これです。', cn: '是吗。我拍了很多照片。你看。' }, { role: '管理人', gender: 'f', jp: 'わあ、すごい　人ですね。', cn: '哇，人真多啊。' }, { role: 'ミラー', gender: 'm', jp: 'ええ。ちょっと　疲れました。', cn: '是啊。有点累了。' }] },
 
-            // --- 短对话 (图片3) ---
-            {
-                category: '练习：真辛苦啊',
-                lines: [
-                    { role: 'A', gender: 'f', jp: 'きのう　12時まで　勉強しました。', cn: '昨天我学习到了12点。' },
-                    { role: 'B', gender: 'm', jp: 'そうですか。何時に　寝ましたか。', cn: '是吗。几点睡的？' },
-                    { role: 'A', gender: 'f', jp: '1時に　寝ました。', cn: '1点睡的。' },
-                    { role: 'B', gender: 'm', jp: '大変ですね。', cn: '真辛苦啊/够受的啊。' }
-                ]
-            }
+            // === 第13课 (想要/目的) ===
+            { lesson: 13, category: '例文 1', lines: [{ role: 'Q', gender: 'f', jp: '今　何が　いちばん　欲しいですか。', cn: '现在最想要什么？' }, { role: 'A', gender: 'm', jp: '…新しい　ケータイが　欲しいです。', cn: '…想要新手机。' }] },
+            { lesson: 13, category: '例文 2', lines: [{ role: 'Q', gender: 'f', jp: '夏休みは　どこへ　行きたいですか。', cn: '暑假想去哪里？' }, { role: 'A', gender: 'm', jp: '…沖縄へ　行きたいです。', cn: '…想去冲绳。' }] },
+            { lesson: 13, category: '例文 3', lines: [{ role: 'Q', gender: 'f', jp: 'きょうは　疲れましたから、何も　したくないです。', cn: '今天累了，什么都不想做。' }, { role: 'A', gender: 'm', jp: '…そうですね。きょうの　会議は　大変でしたね。', cn: '…是啊。今天的会议很辛苦呢。' }] },
+            { lesson: 13, category: '例文 4', lines: [{ role: 'Q', gender: 'f', jp: '週末は　何を　しますか。', cn: '周末做什么？' }, { role: 'A', gender: 'm', jp: '…子どもと　神戸へ　船を　見に　行きます。', cn: '…和孩子去神户看船。' }] },
+            { lesson: 13, category: '例文 5', lines: [{ role: 'Q', gender: 'f', jp: '日本へ　何の　勉強に　来ましたか。', cn: '来日本是为了学什么？' }, { role: 'A', gender: 'm', jp: '…美術の　勉強に　来ました。', cn: '…是来学美术的。' }] },
+            { lesson: 13, category: '例文 6', lines: [{ role: 'Q', gender: 'f', jp: '冬休みは　どこか　行きましたか。', cn: '寒假去哪儿了吗？' }, { role: 'A', gender: 'm', jp: '…ええ。北海道へ　スキーに　行きました。', cn: '…嗯。去北海道滑雪了。' }] },
+            { lesson: 13, category: '会话：分开结账', lines: [{ role: '山田', gender: 'm', jp: 'もう　12時ですよ。昼ごはんを　食べに　行きませんか。', cn: '已经12点了哦。不去吃午饭吗？' }, { role: 'ミラー', gender: 'm', jp: 'ええ。どこへ　行きますか。', cn: '好啊。去哪里？' }, { role: '山田', gender: 'm', jp: 'そうですね。きょうは　日本料理が　食べたいですね。', cn: '嗯……今天想吃日本菜呢。' }, { role: 'ミラー', gender: 'm', jp: 'じゃ、「つるや」へ　行きましょう。', cn: '那去“Tsuruya”吧。' }, { role: '店の人', gender: 'f', jp: 'ご注文は？', cn: '请问点什么？' }, { role: 'ミラー', gender: 'm', jp: 'わたしは　てんぷら定食。', cn: '我要天妇罗套餐。' }, { role: '山田', gender: 'm', jp: 'わたしは　牛どん。', cn: '我要牛肉盖饭。' }, { role: '店の人', gender: 'f', jp: 'てんぷら定食と　牛どんですね。少々　お待ち　ください。', cn: '天妇罗套餐和牛肉盖饭是吧。请稍等。' }, { role: '店の人', gender: 'f', jp: '1,680円で　ございます。', cn: '一共1,680日元。' }, { role: 'ミラー', gender: 'm', jp: 'すみません。別々に　お願いします。', cn: '不好意思。请分开结账。' }, { role: '店の人', gender: 'f', jp: 'はい。てんぷら定食は　980円、牛どんは　700円です。', cn: '好的。天妇罗套餐980日元，牛肉盖饭700日元。' }] },
+
+            // === 第14课 (Te形/请求) ===
+            { lesson: 14, category: '例文 1', lines: [{ role: 'A', gender: 'f', jp: 'ボールペンで　名前を　書いて　ください。', cn: '请用圆珠笔写名字。' }, { role: 'B', gender: 'm', jp: '…はい、わかりました。', cn: '…好的，明白了。' }] },
+            { lesson: 14, category: '例文 2', lines: [{ role: 'A', gender: 'f', jp: 'すみませんが、この　漢字の　読み方を　教えて　ください。', cn: '不好意思，请教我这个汉字的读法。' }, { role: 'B', gender: 'm', jp: '…「じゅうしょ」ですよ。', cn: '…读作“Juusho”哦。' }] },
+            { lesson: 14, category: '例文 3', lines: [{ role: 'A', gender: 'f', jp: '暑いですね。窓を　開けましょうか。', cn: '真热啊。我把窗户打开吧？' }, { role: 'B', gender: 'm', jp: '…すみません。お願いします。', cn: '…不好意思。麻烦你了。' }] },
+            { lesson: 14, category: '例文 4', lines: [{ role: 'A', gender: 'f', jp: '駅まで　迎えに　行きましょうか。', cn: '我去车站接你吧？' }, { role: 'B', gender: 'm', jp: '…タクシーで　行きますから、けっこうです。', cn: '…我坐出租车去，不用了。' }] },
+            { lesson: 14, category: '例文 5', lines: [{ role: 'Q', gender: 'f', jp: '佐藤さんは　どこですか。', cn: '佐藤小姐在哪里？' }, { role: 'A', gender: 'm', jp: '…今　会議室で　松本さんと　話して　います。', cn: '…现在正在会议室和松本先生/女士说话。' }, { role: 'Q', gender: 'f', jp: 'じゃ、また　あとで　来ます。', cn: '那，我过会儿再来。' }] },
+            { lesson: 14, category: '例文 6', lines: [{ role: 'Q', gender: 'm', jp: '雨が　降って　いますか。', cn: '在下雨吗？' }, { role: 'A', gender: 'f', jp: '…いいえ、降って　いません。', cn: '…不，没在下。' }] },
+            { lesson: 14, category: '会话：麻烦去绿町', lines: [{ role: 'カリナ', gender: 'f', jp: 'みどり町まで　お願いします。', cn: '麻烦去绿町。' }, { role: '運転手', gender: 'm', jp: 'はい。', cn: '好的。' }, { role: 'カリナ', gender: 'f', jp: 'すみません。あの　信号を　右へ　曲がって　ください。', cn: '不好意思。请在那个信号灯右转。' }, { role: '運転手', gender: 'm', jp: '右ですね。', cn: '右转是吧。' }, { role: 'カリナ', gender: 'f', jp: 'ええ。', cn: '嗯。' }, { role: '運転手', gender: 'm', jp: 'まっすぐですか。', cn: '直走吗？' }, { role: 'カリナ', gender: 'f', jp: 'ええ、まっすぐ　行って　ください。', cn: '嗯，请直走。' }, { role: 'カリナ', gender: 'f', jp: 'あの　花屋の　前で　止めて　ください。', cn: '请在那个花店前面停。' }, { role: '運転手', gender: 'm', jp: 'はい。1,800円です。', cn: '好的。1,800日元。' }, { role: 'カリナ', gender: 'f', jp: 'これで　お願いします。', cn: '给你钱。' }, { role: '運転手', gender: 'm', jp: '3,200円の　お釣りです。ありがとう　ございました。', cn: '找您3,200日元。谢谢惠顾。' }] },
+
+            // === 第15课 (许可/禁止/状态) ===
+            { lesson: 15, category: '例文 1', lines: [{ role: 'Q', gender: 'f', jp: 'この　カタログを　もらっても　いいですか。', cn: '这个目录可以拿走吗？' }, { role: 'A', gender: 'm', jp: '…ええ、いいですよ。どうぞ。', cn: '…嗯，可以哦。请拿吧。' }] },
+            { lesson: 15, category: '例文 2', lines: [{ role: 'Q', gender: 'f', jp: 'この　辞書を　借りても　いいですか。', cn: '可以借这本字典吗？' }, { role: 'A', gender: 'm', jp: '…すみません、ちょっと……。今　使って　います。', cn: '…不好意思，有点……。我现在正在用。' }] },
+            { lesson: 15, category: '例文 3', lines: [{ role: 'A', gender: 'm', jp: 'ここで　遊んでは　いけません。', cn: '不可以在这里玩。' }, { role: 'B', gender: 'f', jp: '…はい。', cn: '…是。' }] },
+            { lesson: 15, category: '例文 4', lines: [{ role: 'Q', gender: 'f', jp: '市役所の　電話番号を　知って　いますか。', cn: '知道市政府的电话号码吗？' }, { role: 'A', gender: 'm', jp: '…いいえ、知りません。', cn: '…不，不知道。' }] },
+            { lesson: 15, category: '例文 5', lines: [{ role: 'Q', gender: 'f', jp: 'マリアさんは　どこに　住んで　いますか。', cn: '玛利亚住在哪里？' }, { role: 'A', gender: 'm', jp: '…大阪に　住んで　います。', cn: '…住在大阪。' }] },
+            { lesson: 15, category: '例文 6', lines: [{ role: 'Q', gender: 'f', jp: 'ワンさんは　結婚して　いますか。', cn: '王先生/女士结婚了吗？' }, { role: 'A', gender: 'm', jp: '…いいえ、独身です。', cn: '…不，是单身。' }] },
+            { lesson: 15, category: '例文 7', lines: [{ role: 'Q', gender: 'f', jp: 'お仕事は　何ですか。', cn: '工作是什么？' }, { role: 'A', gender: 'm', jp: '…教師です。高校で　教えて　います。', cn: '…是教师。在高中教书。' }] },
+            { lesson: 15, category: '会话：您的家人？', lines: [{ role: '木村', gender: 'f', jp: 'いい　映画でしたね。', cn: '真是部好电影啊。' }, { role: 'ミラー', gender: 'm', jp: 'ええ。わたしは　家族を　思い出しました。', cn: '是啊。我想起了我的家人。' }, { role: '木村', gender: 'f', jp: 'そうですか。ミラーさんの　ご家族は？', cn: '是吗。米勒先生的家人是？' }, { role: 'ミラー', gender: 'm', jp: '両親と　姉が　1人　います。', cn: '父母和一个姐姐。' }, { role: '木村', gender: 'f', jp: 'どちらに　いらっしゃいますか。', cn: '他们在哪里？' }, { role: 'ミラー', gender: 'm', jp: '両親は　ニューヨークの　近くに　住んで　います。', cn: '父母住在纽约附近。' }, { role: 'ミラー', gender: 'm', jp: '姉は　ロンドンで　働いて　います。', cn: '姐姐在伦敦工作。' }, { role: 'ミラー', gender: 'm', jp: '木村さんの　ご家族は？', cn: '木村小姐的家人呢？' }, { role: '木村', gender: 'f', jp: '3人です。父は　銀行員です。', cn: '有3人。父亲是银行职员。' }, { role: '木村', gender: 'f', jp: '母は　高校で　英語を　教えて　います。', cn: '母亲在高中教英语。' }] },
         ];
 
-        // ================= 状态管理 =================
+        // ================= 逻辑变量 =================
+        let activeData = [];
         let currentIndex = 0;
         let globalShowJp = false;
         let globalShowCn = false;
         let isSeqPlaying = false;
+        let selectedLessons = [11, 12, 13, 14, 15];
         let voices = { male: null, female: null, default: null };
+
+        // ================= 初始化与筛选 =================
+        function init() {
+            filterData();
+            loadVoices();
+        }
+
+        function toggleFilter(label, lessonNum) {
+            const checkbox = label.querySelector('input');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                label.classList.add('checked');
+                if(!selectedLessons.includes(lessonNum)) selectedLessons.push(lessonNum);
+            } else {
+                label.classList.remove('checked');
+                selectedLessons = selectedLessons.filter(l => l !== lessonNum);
+            }
+            selectedLessons.sort((a,b) => a-b);
+            filterData();
+        }
+
+        function filterData(shuffle = false) {
+            let temp = rawData.filter(item => selectedLessons.includes(item.lesson));
+            if (shuffle) {
+                for (let i = temp.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [temp[i], temp[j]] = [temp[j], temp[i]];
+                }
+            }
+            activeData = temp;
+            currentIndex = 0;
+            render();
+        }
+
+        function shuffleAndReset() {
+            filterData(true);
+            const btn = document.querySelector('.btn-blue');
+            const originalText = btn.innerText;
+            btn.innerText = "✅ 已打乱";
+            setTimeout(() => btn.innerText = originalText, 1000);
+        }
 
         // ================= 语音引擎 =================
         function loadVoices() {
             const all = window.speechSynthesis.getVoices();
             const ja = all.filter(v => v.lang.includes('ja'));
             if (ja.length > 0) {
-                // 尝试区分男女声
                 voices.female = ja.find(v => v.name.includes('Kyoko') || v.name.includes('Female')) || ja[0];
                 voices.male = ja.find(v => v.name.includes('Otoya') || v.name.includes('Male')) || ja[0];
                 voices.default = ja[0];
                 document.getElementById('status-bar').innerText = "✅ 语音加载完成";
-            } else {
-                document.getElementById('status-bar').innerText = "⚠️ 使用默认语音";
             }
         }
-        // 兼容性处理
         if (window.speechSynthesis.onvoiceschanged !== undefined) window.speechSynthesis.onvoiceschanged = loadVoices;
-        setTimeout(loadVoices, 500);
 
         function speak(text, gender, callback) {
             window.speechSynthesis.cancel();
             const u = new SpeechSynthesisUtterance(text);
             u.lang = 'ja-JP';
-            u.rate = 0.9; // 语速稍慢
+            u.rate = 0.9;
             
-            // 声音分配
             if (gender === 'm' && voices.male) u.voice = voices.male;
             else if (gender === 'f' && voices.female) u.voice = voices.female;
             else if (voices.default) u.voice = voices.default;
 
-            // 音调微调
-            if (gender === 'm') u.pitch = 0.95;
-            else u.pitch = 1.05;
-
+            u.pitch = (gender === 'm') ? 0.95 : 1.05;
             if (callback) u.onend = callback;
             window.speechSynthesis.speak(u);
         }
@@ -213,23 +245,32 @@
             window.speechSynthesis.cancel();
             isSeqPlaying = false;
             
-            const data = lessonData[currentIndex];
-            document.getElementById('headerTitle').innerText = `${data.category} (${currentIndex + 1}/${lessonData.length})`;
+            const cardArea = document.getElementById('cardArea');
+            const pageTitle = document.getElementById('pageTitle');
+
+            if (activeData.length === 0) {
+                cardArea.innerHTML = `<div class="empty-tip">请至少选择一课</div>`;
+                pageTitle.innerText = "未选择课程";
+                return;
+            }
+            
+            const data = activeData[currentIndex];
+            pageTitle.innerText = `进度: ${currentIndex + 1} / ${activeData.length}`;
             
             updateGlobalBtns();
 
-            let html = `<div class="tag">${data.category}</div>`;
-            html += `<button class="btn-green" onclick="playSequence()">▶️ 完整播放 (包含停顿)</button>`;
-            html += `<div style="text-align:left; width:100%;">`;
+            let html = `
+                <div class="lesson-badge">第${data.lesson}课</div>
+                <div class="tag">${data.category}</div>
+                <button class="btn-green" onclick="playSequence()">▶️ 完整播放 (包含停顿)</button>
+                <div style="text-align:left; width:100%;">
+            `;
 
             data.lines.forEach((line, idx) => {
                 const jpClass = globalShowJp ? 'text-block jp-text' : 'text-block jp-text masked';
                 const cnClass = globalShowCn ? 'text-block cn-text' : 'text-block cn-text masked';
+                let roleClass = line.gender === 'm' ? 'role-m' : 'role-f';
                 
-                // 角色颜色分配
-                let roleClass = 'role-f';
-                if (line.gender === 'm') roleClass = 'role-m';
-
                 html += `
                     <div class="dialogue-row" id="row-${idx}">
                         <div class="play-col"><div class="play-icon" onclick="playLine(${idx})">🔊</div></div>
@@ -242,7 +283,7 @@
                 `;
             });
             html += `</div>`;
-            document.getElementById('cardArea').innerHTML = html;
+            cardArea.innerHTML = html;
         }
 
         // ================= 交互逻辑 =================
@@ -250,82 +291,42 @@
             if(el.classList.contains('masked')) el.classList.remove('masked');
             else el.classList.add('masked');
         }
-
-        function toggleGlobal(type) {
-            if (type === 'jp') globalShowJp = !globalShowJp;
-            if (type === 'cn') globalShowCn = !globalShowCn;
-            render();
+        function toggleGlobal(type) { 
+            if (type === 'jp') globalShowJp = !globalShowJp; 
+            if (type === 'cn') globalShowCn = !globalShowCn; 
+            render(); 
         }
-
         function updateGlobalBtns() {
-            const bJ = document.getElementById('btnJp');
-            const bC = document.getElementById('btnCn');
-            bJ.className = globalShowJp ? 'btn-toggle active' : 'btn-toggle';
-            bC.className = globalShowCn ? 'btn-toggle active' : 'btn-toggle';
-            bJ.innerText = globalShowJp ? '全显日文' : '全隐日文';
-            bC.innerText = globalShowCn ? '全显中文' : '全隐中文';
+            const bJ = document.getElementById('btnJp'); const bC = document.getElementById('btnCn');
+            bJ.className = globalShowJp ? 'btn-toggle active' : 'btn-toggle'; bC.className = globalShowCn ? 'btn-toggle active' : 'btn-toggle';
+            bJ.innerText = globalShowJp ? '全显日文' : '全隐日文'; bC.innerText = globalShowCn ? '全显中文' : '全隐中文';
         }
-
         function playLine(idx) {
-            isSeqPlaying = false;
-            highlightRow(idx);
-            const data = lessonData[currentIndex];
-            const line = data.lines[idx];
-            speak(line.jp, line.gender, () => {
-                unhighlightRow(idx);
-            });
+            isSeqPlaying = false; highlightRow(idx);
+            const data = activeData[currentIndex]; const line = data.lines[idx];
+            speak(line.jp, line.gender, () => { unhighlightRow(idx); });
         }
-
         function playSequence() {
-            isSeqPlaying = true;
-            const data = lessonData[currentIndex];
-            let idx = 0;
-            
-            // 清除旧的高亮
+            isSeqPlaying = true; const data = activeData[currentIndex]; let idx = 0;
             document.querySelectorAll('.dialogue-row').forEach(e => e.classList.remove('playing-row'));
-
             function next() {
-                if (!isSeqPlaying || idx >= data.lines.length) {
-                    isSeqPlaying = false;
-                    if(idx > 0) unhighlightRow(idx-1);
-                    return;
-                }
-                
-                if (idx > 0) unhighlightRow(idx-1);
-                highlightRow(idx);
-                
+                if (!isSeqPlaying || idx >= data.lines.length) { isSeqPlaying = false; if(idx > 0) unhighlightRow(idx-1); return; }
+                if (idx > 0) unhighlightRow(idx-1); highlightRow(idx);
                 document.getElementById(`row-${idx}`).scrollIntoView({behavior: "smooth", block: "center"});
-
                 const line = data.lines[idx];
-                speak(line.jp, line.gender, () => {
-                    idx++;
-                    // 句与句之间暂停0.6秒
-                    setTimeout(next, 600);
-                });
+                speak(line.jp, line.gender, () => { idx++; setTimeout(next, 600); });
             }
             next();
         }
-
-        function highlightRow(idx) {
-            const el = document.getElementById(`row-${idx}`);
-            if (el) el.classList.add('playing-row');
+        function highlightRow(idx) { const el = document.getElementById(`row-${idx}`); if (el) el.classList.add('playing-row'); }
+        function unhighlightRow(idx) { const el = document.getElementById(`row-${idx}`); if (el) el.classList.remove('playing-row'); }
+        function changeCard(dir) { 
+            const next = currentIndex + dir; 
+            if (next >= 0 && next < activeData.length) { currentIndex = next; render(); } 
         }
 
-        function unhighlightRow(idx) {
-            const el = document.getElementById(`row-${idx}`);
-            if (el) el.classList.remove('playing-row');
-        }
-
-        function changeCard(dir) {
-            const next = currentIndex + dir;
-            if (next >= 0 && next < lessonData.length) {
-                currentIndex = next;
-                render();
-            }
-        }
-
-        // 初始化
-        render();
+        // 启动
+        setTimeout(init, 100);
     </script>
 </body>
 </html>
